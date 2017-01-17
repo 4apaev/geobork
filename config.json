@@ -1,0 +1,7 @@
+{
+  "PORT"  : 3000,
+  "HOST"  : "mongodb://localhost:27017/geobork",
+  "NAME"  : "borks",
+  "ROUTE" : "/v1/borks",
+  "FIELD" : "loc"
+}

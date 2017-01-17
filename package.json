@@ -1,0 +1,19 @@
+{
+  "name": "geobork",
+  "version": "1.0.0",
+  "description": "wase for dogs",
+  "main": "index.js",
+  "author": {
+    "name": "Michael Miretski",
+    "email": "4apaev@gmail.com"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "scripts": {
+    "start" : "node index"
+  },
+  "dependencies": {
+    "is": "git@github.com:4apaev/is.git#assert"
+  }
+}
