@@ -1,6 +1,5 @@
 'use strict';
 
-const Is = require('is');
 const DB = require('./base');
 const { Range, Coords } = require('../util/geo')
 
