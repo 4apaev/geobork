@@ -11,13 +11,13 @@ module.exports = class GeoDB extends DB {
       this.RADIUS = [ 10, 2000 ]
     }
 
-  set(name, item, long, lat) {
-      item[ this.FIELD ] = Coords(long, lat)
+  set(name, item, lng, lat) {
+      item[ this.FIELD ] = Coords(lng, lat)
       return this.add(name, item)
     }
 
-  get(name, query, long, lat, radius) {
-      query[ this.FIELD ] = this.near(long, lat, radius)
+  get(name, query, lng, lat, radius) {
+      query[ this.FIELD ] = this.near(lng, lat, radius)
       return this.list(name, query);
     }
 
@@ -26,13 +26,15 @@ module.exports = class GeoDB extends DB {
       return this.index(indx, ...names)
     }
 
-  near(long, lat, radius) {
-      const [ min, max ] = this.RADIUS;
+  near(lng, lat, radius) {
+      const [ min, max ] = this.RADIUS
+      const maxdist = Range(min, radius, max)
+      const coordinates = Coords(lng, lat)
       return {
         $near: {
-          $maxDistance: Range(min, radius, max),
+          $maxDistance: maxdist,
           $geometry: {
-            coordinates: Coords(long, lat),
+            coordinates,
             type: 'Point'
           }
         }
