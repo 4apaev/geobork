@@ -42,6 +42,7 @@ module.exports = class DB {
   }
 
   add(name, item) {
+    item.updated = Date.now()
     const col = this.db.collection(name);
     return col.insertOne(item)
               .then(DB.wrap)
