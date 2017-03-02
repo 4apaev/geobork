@@ -49,6 +49,14 @@ module.exports = class DB {
               .catch(DB.fail);
   }
 
+  update(name, query, item) {
+    item.updated = Date.now()
+    const col = this.db.collection(name);
+    return col.updateOne(query, { $set: item })
+              .then(DB.wrap)
+              .catch(DB.fail);
+  }
+
   static wrap(result) {
     return { result }
   }
