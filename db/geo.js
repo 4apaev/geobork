@@ -16,16 +16,21 @@ module.exports = class GeoDB extends DB {
     }
 
   get(name, query, coords) {
-      query[ this.FIELD ] = this.near(coords)
+      query[ this.FIELD ] = GeoDB.near(coords)
       return this.list(name, query);
     }
 
   index2d(...names) {
-      const indx = { [ this.FIELD ]: '2dsphere' }
-      return this.index(indx, ...names)
+      const i = { [ this.FIELD ]: '2dsphere' }
+      return this.index(i, ...names)
     }
 
-  near(coords) {
+  update(name, query, item, coords) {
+      item[ this.FIELD ] = Coords(coords)
+      return super.update(name, query, item)
+    }
+
+  static near(coords) {
       return {
         $near: {
           $maxDistance: Range(100, coords.radius, 2000),
