@@ -3,9 +3,14 @@
 const { MongoClient, ObjectID } = require('mongodb');
 
 module.exports = class DB {
-  constructor({ limit = 100 }) {
+  constructor({ name, limit = 100 }) {
     this.LIMIT = limit
+    this.NAME = name
   }
+
+  get collection() {
+      return this.db.collection(this.NAME);
+    }
 
   connect(host) {
     return MongoClient.connect(host).then(db => {
@@ -23,36 +28,34 @@ module.exports = class DB {
     return Promise.all(buf)
   }
 
-  list(name, query, skip, limit) {
-    const col = this.db.collection(name),
-          cursor = col.find(query)
+  list(query, skip, limit) {
+    const cursor = this.collection
+                      .find(query)
                       .skip(0|skip)
                       .limit(0|limit||this.LIMIT);
     return cursor.count()
-                 .then(total => cursor.toArray()
-                                      .then(result => ({ result, total })))
-                 .catch(DB.fail);
+                  .then(total => cursor.toArray().then(result => ({ result, total })))
+                  .catch(DB.fail);
   }
 
-  find(name, id) {
-    const col = this.db.collection(name);
-    return col.findOne(ObjectID(id))
+  find(id) {
+    return this.collection
+              .findOne(ObjectID(id))
               .then(DB.wrap)
               .catch(DB.fail);
   }
 
-  add(name, item) {
+  add(item) {
     item.updated = Date.now()
-    const col = this.db.collection(name);
-    return col.insertOne(item)
+    return this.collection
+              .insertOne(item)
               .then(DB.wrap)
               .catch(DB.fail);
   }
 
-  update(name, query, item) {
+  update(query, item) {
     item.updated = Date.now()
-    const col = this.db.collection(name);
-    return col.updateOne(query, { $set: item })
+    return this.collection.updateOne(query, { $set: item })
               .then(DB.wrap)
               .catch(DB.fail);
   }

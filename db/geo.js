@@ -4,30 +4,29 @@ const DB = require('./base');
 const { Range, Coords } = require('../util/geo')
 
 module.exports = class GeoDB extends DB {
+  constructor({ name, limit, field }) {
+    super({ name, limit, })
+    this.FIELD = field
+  }
 
-  constructor({ limit, field }) {
-      super({ limit });
-      this.FIELD = field
-    }
-
-  set(name, item, coords) {
+  add(item, coords) {
       item[ this.FIELD ] = Coords(coords)
-      return this.add(name, item)
+      return super.add(item)
     }
 
-  get(name, query, coords) {
+  list(query, coords) {
       query[ this.FIELD ] = GeoDB.near(coords)
-      return this.list(name, query);
+      return super.list(query);
+    }
+
+  update(query, item, coords) {
+      item[ this.FIELD ] = Coords(coords)
+      return super.update(query, item)
     }
 
   index2d(...names) {
       const i = { [ this.FIELD ]: '2dsphere' }
       return this.index(i, ...names)
-    }
-
-  update(name, query, item, coords) {
-      item[ this.FIELD ] = Coords(coords)
-      return super.update(name, query, item)
     }
 
   static near(coords) {
