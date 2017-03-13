@@ -1,10 +1,12 @@
 'use strict';
 
-const Is = require('is')
+
+const isNum = x => x===+x
+const isRange = (min, x, max) => min <= x && x <= max;
 
 const R = 6371e3; // Radius of the Earth in km
 const P = Math.PI/180
-const Range = (min, x, max) => Is.num(x=parseFloat(x)) && Is.range(min, x, max) ? x : max;
+const Range = (min, x, max) => isNum(x=parseFloat(x)) && isRange(min, x, max) ? x : max;
 const Lat = x => Range(-90, +x, 90)
 const Lng = x => Range(-180, +x, 180)
 const Coords = ({ lat, lng }) => [ Lat(lat), Lng(lng) ]
@@ -22,3 +24,4 @@ const Diff = (a, b) => {
 }
 
 module.exports = {  Range, Lat, Lng, Coords, Diff, Deg2Rad }
+
