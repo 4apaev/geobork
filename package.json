@@ -1,14 +1,15 @@
 {
   "name": "geobork",
   "version": "1.0.0",
-  "description": "wase for dogs",
+  "description": "Geo services for dogs",
   "main": "index.js",
   "author": {
     "name": "Michael Miretski",
     "email": "4apaev@gmail.com"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "https://github.com/4apaev/geobork.git"
   },
   "scripts": {
     "start" : "node index"
