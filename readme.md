@@ -1,7 +1,6 @@
-geobork
+Geobork
 =======
-wase for dogds
-==============
+Geo services for dogs
 
 
 
