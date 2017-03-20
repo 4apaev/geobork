@@ -49,15 +49,19 @@ module.exports = class DB {
     item.updated = Date.now()
     return this.collection
               .insertOne(item)
-              .then(DB.wrap)
+              .then(DB.getRes)
               .catch(DB.fail);
   }
 
   update(query, item) {
     item.updated = Date.now()
     return this.collection.updateOne(query, { $set: item })
-              .then(DB.wrap)
+              .then(DB.getRes)
               .catch(DB.fail);
+  }
+
+  static getRes({ ops }) {
+    return DB.wrap(ops[ 0 ])
   }
 
   static wrap(result) {
