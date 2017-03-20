@@ -2,7 +2,7 @@
 
 global.log = console.log.bind(console)
 
-const { PORT, MONGO_HOST } = process.env;
+const { PORT=3000, MONGO_HOST='mongodb://localhost:27017/borkdb' } = process.env;
 const app = require('miniserver')()
 const Borks = require('./routes/borks')
 const GeoDB = require('./db/geo')
