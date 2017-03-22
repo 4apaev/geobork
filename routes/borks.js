@@ -1,14 +1,14 @@
 'use strict';
 
 const json = require('./json')
-const minutes = ago => Date.now()-ago*60000 //minute in mil
+const time = require('../util/time')
 
 exports.list = list
 exports.add = add
 
 function list(req, res) {
-    const { lat, lng, type, radius, ago=120 } = req.query;
-    const query = { updated: { $gt: minutes(ago) } }
+    const { lat, lng, type, radius, ago } = req.query;
+    const query = { updated: { $gt: time(0|ago) } }
 
     type && (query.type = type)
     return this.DB.list(query, { lat, lng, radius })
