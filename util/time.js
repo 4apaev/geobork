@@ -1,7 +1,7 @@
 'use strict';
 
 
-const min = 1000*60*60 // hour
+const min = 1000*60*30 // 30 min
 const max = min*24*365 // year
 
 module.exports = ago => {
