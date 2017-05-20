@@ -12,14 +12,14 @@ module.exports = class DB {
       return this.db.collection(this.NAME);
     }
 
-  connect(host) {
+  async connect(host) {
     return MongoClient.connect(host).then(db => {
       this.db = db
       return this
     })
   }
 
-  index(obj, ...names) {
+  async index(obj, ...names) {
     const n = names.length,
           buf = Array(n);
     for(let i = 0; i < n; i++)
@@ -28,7 +28,7 @@ module.exports = class DB {
     return Promise.all(buf)
   }
 
-  list(query, skip, limit) {
+  async list(query, skip, limit) {
     const cursor = this.collection
                       .find(query)
                       .skip(0|skip)
@@ -38,14 +38,14 @@ module.exports = class DB {
                   .catch(DB.fail);
   }
 
-  find(id) {
+  async find(id) {
     return this.collection
               .findOne(ObjectID(id))
               .then(DB.wrap)
               .catch(DB.fail);
   }
 
-  add(item) {
+  async add(item) {
     item.updated = Date.now()
     return this.collection
               .insertOne(item)
@@ -53,7 +53,7 @@ module.exports = class DB {
               .catch(DB.fail);
   }
 
-  update(query, item) {
+  async update(query, item) {
     item.updated = Date.now()
     return this.collection.updateOne(query, { $set: item })
               .then(DB.getRes)

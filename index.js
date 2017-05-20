@@ -14,30 +14,29 @@ const DB = app.DB = new GeoDB({
   field: Conf.FIELD
 });
 
-DB.connect(MONGO_HOST)
-  .then(() =>
-        DB.index2d(Conf.NAME))
 
-  .then(() =>
-    app
-      .use(require('miniserver/middleware/logger')('statusCode', 'method', 'url'))
-      .use(require('miniserver/middleware/cors'))
-      .post(require('miniserver/middleware/body'))
+async function main() {
 
-      .get('/', (req, res) => {
-        res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.end('ok');
-      })
+  await DB.connect(MONGO_HOST)
+  await DB.index2d(Conf.NAME)
 
-      .get(Conf.ROUTE, Borks.list)
-      .post(Conf.ROUTE, Borks.add)
-      .listen(PORT, () => log(`
-==========================
-  connected to ${ MONGO_HOST }
-  running on localhost:${ PORT }
-==========================
-    `)))
+  app
+    .use(require('miniserver/middleware/logger')('statusCode', 'method', 'url'))
+    .use(require('miniserver/middleware/cors'))
+    .post(require('miniserver/middleware/body'))
+    .get('/', (req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/html' })
+      res.end('ok');
+    })
+    .get(Conf.ROUTE, Borks.list)
+    .post(Conf.ROUTE, Borks.add)
+    .listen(PORT, () => log(`
+    ==========================
+    connected to ${ MONGO_HOST }
+    running on localhost:${ PORT }
+    ==========================
+    `))
 
-  .catch(err => {
-    log(err)
-  });
+}
+
+main()
