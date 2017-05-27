@@ -6,7 +6,7 @@ const Qs = require('querystring');
 const Url = require('url');
 const { STATUS_CODES } = require('http')
 const Https = require('https')
-const { MongoClient, ObjectID } = require('mongodb');
+const { MongoClient } = require('mongodb');
 
 const TIME = 7200000 // 2 hours
 const RADIUS = 2000 // 2km
