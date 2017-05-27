@@ -12,10 +12,10 @@
     "url": "https://github.com/4apaev/geobork.git"
   },
   "scripts": {
-    "start" : "node index"
+    "start" : "node index",
+    "build" : "docker-compose up -d --build"
   },
   "dependencies": {
-    "mongodb": "latest",
-    "miniserver": "https://github.com/4apaev/miniserver.git"
+    "mongodb": "latest"
   }
 }

@@ -1,5 +1,0 @@
-{
-  "NAME"  : "borks",
-  "ROUTE" : "/v1/borks",
-  "FIELD" : "loc"
-}
