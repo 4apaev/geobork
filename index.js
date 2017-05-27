@@ -1,5 +1,4 @@
 'use strict';
-
 const { log } = console
 const { PORT = 3000, MONGO_HOST = 'mongodb://localhost:27017/borkdb' } = process.env;
 const Fs = require('fs');
@@ -20,60 +19,53 @@ const certs = {
 }
 
 MongoClient.connect(MONGO_HOST)
-  .then(DB => {
-    const Col = DB.collection(COLLECTION)
-    return Col.createIndex({
-      updated: 1,
-      loc: '2dsphere'
-    })
-      .then(() => Col)
-  })
+  .then(DB => DB.collection(COLLECTION).createIndex({ updated: 1, loc: '2dsphere' })
+        .then(() => DB.collection(COLLECTION)))
   .then(Col => {
-
-  Https.createServer(certs, (req, res) => {
-    const { query, pathname } = Url.parse(req.url)
-    if (req.method!='GET')
-      return json(req, res, { ok:false }, 405)
-    if (pathname==='/')
-      return json(req, res, { ok:true }, 200)
-    if (pathname!=ROUTE_LIST && pathname!=ROUTE_ADD)
-      return json(req, res, { ok:false }, 404)
-
-    const now = Date.now()
-    const { lat, lng, skip, limit } = parse(Qs.parse(query))
-
-    const prm = pathname===ROUTE_LIST
-      ? Col.find({ updated: { $gt: now-TIME }, loc: { $near: { $maxDistance: RADIUS, $geometry: { type: 'Point', coordinates: [ lat, lng ] }}}})
-            .skip(skip)
-            .limit(limit)
-            .toArray()
-            .then(result => {
-              json(req, res, { ok:true, result }, 200)
-            })
-      : Col.insertOne({ loc: [ lat, lng ], updated: now })
-            .then(x => {
-              const result = x.ops[ 0 ]
-              json(req, res, { ok:true, result }, 200)
-            })
-
-    prm.catch(err => {
-      json(req, res, { ok: false, err: { message:err.message, stack:err.stack }}, 500)
+    Https.createServer(certs, (req, res) => {
+      const { query, pathname } = Url.parse(req.url)
+      if (req.method!='GET') json(req, res, 405)
+      else if (pathname==='/') json(req, res, 200)
+      else if (pathname===ROUTE_LIST) list(req, res, Col, parse(Qs.parse(query)))
+      else if (pathname===ROUTE_ADD) add(req, res, Col, parse(Qs.parse(query)))
+      else json(req, res, 404)
     })
-
-
-  }).listen(PORT, () => {
-    log('geobork server on ', PORT)
+      .listen(PORT, () => log('geobork server on ', PORT))
+  })
+  .catch(err => {
+    log('FAIL CONNECT TO MONGO')
+    log(err)
+    process.exit(1)
   })
 
+function add(req, res, Col, { loc }) {
+    Col.insertOne({ loc, updated: Date.now() })
+        .then(x => {
+          json(req, res, 200, { result: x.ops[ 0 ] })
+        })
+        .catch(({ message, stack }) => {
+            json(req, res, 500, { err: { message, stack }})
+          })
+  }
 
-}).catch(err => {
-  log('FAIL TO CONNECT MONGO')
-  log(err)
-  process.exit(1)
-})
+function list(req, res, Col, { loc, skip, limit }) {
+    Col.find({
+      updated: { $gt: Date.now()-TIME },
+      loc: { $near: { $maxDistance: RADIUS, $geometry: { type: 'Point', coordinates:loc }}}
+    })
+      .skip(skip)
+      .limit(limit)
+      .toArray()
+      .then(result => {
+          json(req, res, 200, { result })
+        })
+      .catch(({ message, stack }) => {
+          json(req, res, 500, { err: { message, stack }})
+        })
+  }
 
-
-function json(req, res, payload, code) {
+function json(req, res, code, payload={}) {
+  payload.ok = code===200
   const body = JSON.stringify(payload)
   res.statusCode = code;
   res.statusMessage = STATUS_CODES[ code ];
@@ -91,26 +83,16 @@ function parse({ lat, lng, skip, limit }) {
   skip = 0|skip
   limit = 0|limit
 
-  if (skip<0)
-    skip=0
+  if (skip<0) skip=0
+  if (limit<0) limit=0
+  else if (limit>100) limit=100
 
-  if (limit<0)
-    limit=0
-  else if (limit>100)
-    limit=100
+  if (isNaN(lat)) lat = 0
+  else if (lat < -90) lat = -90
+  else if (lat > 90) lat = 90
 
-  if (isNaN(lat))
-    lat = 0
-  else if (lat < -90)
-    lat = -90
-  else if (lat > 90)
-    lat = 90
-
-  if (isNaN(lng))
-    lng = 0
-  else if (lng < -180)
-    lng = -180
-  else if (lng > 180)
-    lng = 180
-  return { lat, lng, skip, limit }
+  if (isNaN(lng)) lng = 0
+  else if (lng < -180) lng = -180
+  else if (lng > 180) lng = 180
+  return { loc:[ lat, lng ], skip, limit }
 }
