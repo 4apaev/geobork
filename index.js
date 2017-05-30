@@ -32,7 +32,7 @@ async function main() {
       try {
 
         if (req.method!='GET')
-          json(req, res, 405, { err: { message: 'Method Not Allowed' }}))
+          json(req, res, 405, { err: { message: 'Method Not Allowed' }})
 
         else if (pathname==='/')
           json(req, res, 200)
