@@ -10,7 +10,7 @@ const json = require('./json')
 const { MongoClient } = require('mongodb');
 
 const { PORT = 3000, MONGO_HOST = 'mongodb://localhost:27017/borkdb' } = process.env;
-const TIME = 7200000 // 2 hours
+const TIME = 1000*60*60*2 // 2 hours
 const RADIUS = 2000 // 2km
 const ROUTE_LIST = '/v2/borks'
 const ROUTE_ADD = ROUTE_LIST + '/add'
@@ -32,7 +32,7 @@ async function main() {
       try {
 
         if (req.method!='GET')
-          json(req, res, 405)
+          json(req, res, 405, { err: { message: 'Method Not Allowed' }}))
 
         else if (pathname==='/')
           json(req, res, 200)
@@ -50,7 +50,7 @@ async function main() {
         }
 
         else
-          json(req, res, 404)
+          json(req, res, 404, { err: { message: 'Not Found' }})
 
       } catch({ message, stack }) {
           json(req, res, 500, { err: { message, stack }})
