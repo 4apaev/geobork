@@ -1,6 +1,6 @@
 {
   "name": "geobork",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Geo services for dogs",
   "main": "index.js",
   "author": {
@@ -13,7 +13,8 @@
   },
   "scripts": {
     "start" : "node index",
-    "build" : "cp ../*.pem . && docker-compose up -d --build"
+    "cert"  : "cp ../*.pem ./conf",
+    "build" : "docker-compose up -d --build"
   },
   "dependencies": {
     "mongodb": "latest"
